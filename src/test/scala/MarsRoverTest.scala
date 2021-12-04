@@ -1,3 +1,4 @@
+import model.{Coordinate, East, Forward, Grid, North, RotateAnticlockwise, RotateClockwise, South, West}
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.{FreeSpec, Matchers}
 

@@ -1,3 +1,5 @@
+package model
+
 sealed trait Instruction
 
 case object Forward             extends Instruction

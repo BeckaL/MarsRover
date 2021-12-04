@@ -1,3 +1,5 @@
+import model.{Coordinate, Direction, East, Forward, Grid, Instruction, North, RotateAnticlockwise, RotateClockwise, South, West}
+
 object MarsRover {
 
   def getFinalPosition(
@@ -41,5 +43,3 @@ object MarsRover {
     Coordinate(newX, newY)
   }
 }
-
-case class Grid(height: Int, width: Int)

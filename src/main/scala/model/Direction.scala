@@ -1,3 +1,5 @@
+package model
+
 sealed trait Direction
 
 case object North extends Direction
