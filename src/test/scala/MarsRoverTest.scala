@@ -38,5 +38,23 @@ class MarsRoverTest extends FreeSpec with Matchers with TableDrivenPropertyCheck
         MarsRover.getFinalPosition(instructions, startCoordinate, startDirection) shouldBe expectedEndPosition
       }
     }
+
+    "should be able to rotate anticlockwise" in {
+      val instructions = List(RotateAnticlockwise)
+
+      val data = Table(
+        ("startDirection", "expectedEndDirection"),
+        (North, West),
+        (West, South),
+        (South, East),
+        (East, North)
+      )
+
+      forAll(data) { case (startDirection, expectedEndDirection) =>
+        val expectedEndPosition = (expectedEndDirection, startCoordinate)
+        MarsRover.getFinalPosition(instructions, startCoordinate, startDirection) shouldBe expectedEndPosition
+      }
+    }
+
   }
 }
