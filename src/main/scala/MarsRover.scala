@@ -1,7 +1,6 @@
 import model.{Coordinate, Direction, East, Forward, Grid, Instruction, North, RotateAnticlockwise, RotateClockwise, South, West}
 
 object MarsRover {
-
   def getFinalPosition(
     instructions: List[Instruction],
     startCoordinate: Coordinate,
@@ -19,14 +18,12 @@ object MarsRover {
 
   private def rotateClockwise(startDirection: Direction): Direction = rotate90Degrees(startDirection, clockwise = true)
 
-  private def rotate90Degrees(from: Direction, clockwise: Boolean) = {
-    val allDirectionsInOrder = List(North, East, South, West)
-    val nextIndex =
-      if (clockwise)
-        allDirectionsInOrder.indexOf(from) + 1
-      else
-        allDirectionsInOrder.indexOf(from) - 1 + allDirectionsInOrder.size // adding number of directions avoids negative result in modulo
-    allDirectionsInOrder(nextIndex % allDirectionsInOrder.size) // modulo enables wraparound -> i.e. index 5 becomes index 2
+  private def rotate90Degrees(from: Direction, clockwise: Boolean): Direction = {
+    val directionsInOrder = List(North, East, South, West)
+    val increment         = if (clockwise) 1 else -1
+    val indexOfNewDirection =
+      incrementWithWraparound(start = directionsInOrder.indexOf(from), increment = increment, maxSize = directionsInOrder.size)
+    directionsInOrder(indexOfNewDirection)
   }
 
   private def rotateAnticlockwise(startDirection: Direction): Direction = rotate90Degrees(startDirection, clockwise = false)
@@ -38,8 +35,12 @@ object MarsRover {
       case East  => (1, 0)
       case West  => (-1, 0)
     }
-    val newY = ((startCoord.y + yMove) + grid.height) % grid.height
-    val newX = ((startCoord.x + xMove) + grid.width)  % grid.width
+    val newY = incrementWithWraparound(start = startCoord.y, increment = yMove, maxSize = grid.height)
+    val newX = incrementWithWraparound(start = startCoord.x, increment = xMove, maxSize = grid.width)
     Coordinate(newX, newY)
   }
+
+  private def incrementWithWraparound(start: Int, increment: Int, maxSize: Int) =
+    // adding max size to start and increment enables handling of negative numbers consistently with modulo -> i.e. -1 % 4 becomes 3, not -1
+    (start + increment + maxSize) % maxSize
 }
