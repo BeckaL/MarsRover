@@ -4,15 +4,20 @@ object MarsRover {
     instructions: List[Instruction],
     startCoordinate: Coordinate,
     startDirection: Direction
-  ): Coordinate = {
-    val (_, finalCoordinate) =
-      instructions.foldLeft((startDirection, startCoordinate)) { case ((currentDirection, currentCoordinate), instruction) =>
+  ): (Direction, Coordinate) =
+    instructions.foldLeft((startDirection, startCoordinate)) {
+      case ((currentDirection, currentCoordinate), instruction) =>
         instruction match {
-          case Forward => (currentDirection, forwardMove(currentDirection, currentCoordinate))
-          case _       => ???
+          case Forward         => (currentDirection, forwardMove(currentDirection, currentCoordinate))
+          case RotateClockwise => (rotateClockwise(currentDirection), currentCoordinate)
+          case _               => ???
         }
-      }
-    finalCoordinate
+    }
+
+  def rotateClockwise(startDirection: Direction): Direction = {
+    val directionsInOrder   = List(North, East, South, West)
+    val indexOfNewDirection = (directionsInOrder.indexOf(startDirection) + 1) % 4 // wrap around if new index > 3
+    directionsInOrder(indexOfNewDirection)
   }
 
   def forwardMove(direction: Direction, startCoord: Coordinate) = {
