@@ -80,5 +80,40 @@ class MarsRoverTest extends FreeSpec with Matchers with TableDrivenPropertyCheck
       }
     }
 
+    "should be able to follow a set of various instructions correctly" in {
+      val grid = Grid(height = 3, width = 7)
+
+      val startCoordinate = Coordinate(x = 0, y = 0) // x0
+      val startDirection  = West
+      val instructions = List(
+        Forward,             // new position = x1
+        RotateAnticlockwise, // new direction = South
+        Forward,             // new position = x2
+        Forward,             // new position = x3
+        RotateClockwise,     // newDirection = West, position = x3
+        RotateClockwise,     // newDirection = North, position = x3
+        RotateClockwise,     // new Direction = East, position = x3
+        Forward,             // position = x4
+        Forward,             // position = x5
+        Forward,             // position = x6
+        RotateClockwise,     // newDirection = South
+        Forward,             // position = x7
+        RotateAnticlockwise, // newDirection = East
+        Forward              // position = x8 so final position is x = 0, y = 3
+      )
+
+      // visual representation of positions visited
+      //                       x
+      //        0    1    2    3    4    5    6
+      //       ---------------------------------
+      //     2|                               x2 |
+      //  y  1| x4   x5   x6                  x3 |
+      //     0| x0        x7   x8             x1 |
+      //       ----------------------------------
+
+      val expectedEndPosition = (East, Coordinate(x = 3, y = 0))
+
+      MarsRover.getFinalPosition(instructions, startCoordinate, startDirection, grid) shouldBe expectedEndPosition
+    }
   }
 }
