@@ -4,7 +4,7 @@ This is an sbt project using scala 2.13, tested with scalatest, and linted with 
 To run all tests:
 `sbt test`
 
-Covered in this project: part 1 (basic movement) and the first part of part 2 (autopilot without obstacles)
+Covered in this project: part 1 (basic movement) and the first part of part 2 (autopilot without obstacles).
 As noted below, the biggest thing I'd change given more time would be to add in error handling for cases where coordinates are not within the grid.
 
 ## Structure of the project
@@ -16,8 +16,8 @@ Supported instructions are:
 * rotate 90 degrees clockwise
 * rotate 90 degrees anticlockwise
 Tested in `MarsRoverTest`
-Future improvements given more time: 
-1. add error handling for when the start coordinate is not within the grid 
+<br><br> Future improvements given more time: 
+add error handling for when the start coordinate is not within the grid 
 
 ### `PathFinder` 
 Implements path finding assuming no obstacles.
@@ -25,9 +25,10 @@ Contains a function `findShortestPath` which takes a start coordinate, a target 
 This is achieved with a simple function which derives whether the quickest way to get to the target is to go forwards or 
 backwards given the xs and ys of the from coordinate and the target coordinate. It traverses along the y axis until it hits the coordinate, and then along the x axis.
 Tested in `PathFinderTest`
-Future improvements given more time: 
-1. add error handling for when the start or target coordinates are not within the grid
-2. implement path finding with obstacles via breadth first search
+
+<br> Future improvements given more time: 
+<br>1. add error handling for when the start or target coordinates are not within the grid
+<br>2. implement path finding with obstacles via breadth first search
 
 ### `model directory`
 Contains all the case classes and traits used to express the domain. 
