@@ -5,6 +5,7 @@ To run all tests:
 `sbt test`
 
 Covered in this project: part 1 (basic movement) and the first part of part 2 (autopilot without obstacles)
+As noted below, the biggest thing I'd change given more time would be to add in error handling for cases where coordinates are not within the grid.
 
 ## Structure of the project
 
