@@ -1,24 +1,34 @@
 import model.{Coordinate, Grid}
 
+import scala.annotation.tailrec
+
 object PathFinder {
   def findShortestPath(from: Coordinate, to: Coordinate, grid: Grid): List[Coordinate] = {
-    val _ = grid
-    if (from.x == to.x) {
-      pointsOnLine(from.y, to.y, grid.height).map(Coordinate(from.x, _))
-    } else if (from.y == to.y) {
-      pointsOnLine(from.x, to.x, grid.width).map(Coordinate(_, from.y))
-    } else {
-      ???
+    val xIncrement = getIncrement(from = from.x, to = to.x, gridDimensionMax = grid.width)
+    val yIncrement = getIncrement(from = from.y, to = to.y, gridDimensionMax = grid.height)
+
+    @tailrec
+    def traverseUntilTargetReached(current: Coordinate, visited: List[Coordinate]): List[Coordinate] = {
+      val newVisited = visited :+ current
+      if (current == to) {
+        newVisited
+      } else {
+        val next =
+          if (current.y == to.y)
+            current.copy(x = incrementWithWraparound(current.x, xIncrement, grid.width))
+          else
+            current.copy(y = incrementWithWraparound(current.y, yIncrement, grid.height))
+        traverseUntilTargetReached(next, newVisited)
+      }
     }
+
+    traverseUntilTargetReached(from, List.empty)
   }
 
-  private def pointsOnLine(from: Int, to: Int, gridDimensionMax: Int): List[Int] = {
-    val toWithWraparound       = if (to > from) to else to + gridDimensionMax
-    val distanceForwards       = toWithWraparound - from
-    val isQuickerToGoBackwards = distanceForwards > gridDimensionMax / 2
-    val increment              = if (isQuickerToGoBackwards) -1 else 1
-    val numberOfSteps          = if (isQuickerToGoBackwards) gridDimensionMax - distanceForwards else distanceForwards
-    (0 until numberOfSteps + 1).toList.map(i => incrementWithWraparound(from, i * increment, gridDimensionMax))
+  private def getIncrement(from: Int, to: Int, gridDimensionMax: Int) = {
+    val toAssumingAfterFrom    = if (to > from) to else to + gridDimensionMax
+    val isQuickerToGoBackwards = toAssumingAfterFrom - from > gridDimensionMax / 2
+    if (isQuickerToGoBackwards) -1 else 1
   }
 
   // TODO move somewhere common
