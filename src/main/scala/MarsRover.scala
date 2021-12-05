@@ -1,4 +1,5 @@
 import model.{Coordinate, Direction, East, Forward, Grid, Instruction, North, Position, RotateAnticlockwise, RotateClockwise, South, West}
+import Utils.incrementWithWraparound
 
 object MarsRover {
   def getFinalPosition(instructions: List[Instruction], startPosition: Position, grid: Grid): Position =
@@ -35,8 +36,4 @@ object MarsRover {
       incrementWithWraparound(start = orderedDirections.indexOf(from), increment = increment, max = orderedDirections.size)
     orderedDirections(indexOfNewDirection)
   }
-
-  private def incrementWithWraparound(start: Int, increment: Int, max: Int): Int =
-    // adding max size to start and increment enables handling of negative numbers consistently with modulo -> i.e. -1 % 4 becomes 3, not -1
-    (start + increment + max) % max
 }
