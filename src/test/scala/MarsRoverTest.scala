@@ -1,30 +1,32 @@
-import model.{Coordinate, East, Forward, Grid, North, RotateAnticlockwise, RotateClockwise, South, West}
+import model.{Coordinate, East, Forward, Grid, North, Position, RotateAnticlockwise, RotateClockwise, South, West}
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.{FreeSpec, Matchers}
 
 class MarsRoverTest extends FreeSpec with Matchers with TableDrivenPropertyChecks {
-  "A mars rover" - {
-    val tenByTenGrid = Grid(height = 10, width = 10)
-    "should move in a single direction given the directions do not lead off the grid (negative x or y value)" in {
-      val startCoordinate = Coordinate(x = 3, y = 3)
+  "MarsRover.getFinalPosition" - {
+
+    "should calculate a final position given instructions to move in a single direction which do not lead off the grid" in {
       val numberOfMoves   = 3
       val instructions    = List.fill(numberOfMoves)(Forward)
+      val startCoordinate = Coordinate(x = 3, y = 3)
 
       val data = Table(
         ("startDirection", "expectedEndCoordinate"),
-        (North, Coordinate(x = 3, y = 6)),
-        (South, Coordinate(x = 3, y = 0)),
-        (East, Coordinate(x = 6, y = 3)),
-        (West, Coordinate(x = 0, y = 3))
+        (North, startCoordinate.copy(y = 6)),
+        (South, startCoordinate.copy(y = 0)),
+        (East, startCoordinate.copy(x = 6)),
+        (West, startCoordinate.copy(x = 0))
       )
 
       forAll(data) { case (startDirection, expectedEndCoordinate) =>
-        val expectedEndPosition = (startDirection, expectedEndCoordinate)
-        MarsRover.getFinalPosition(instructions, startCoordinate, startDirection, tenByTenGrid) shouldBe expectedEndPosition
+        val startPosition       = Position(startDirection, startCoordinate)
+        val expectedEndPosition = Position(startDirection, expectedEndCoordinate)
+
+        MarsRover.getFinalPosition(instructions, startPosition, tenByTenGrid) shouldBe expectedEndPosition
       }
     }
 
-    "should appear on the other side of the grid when the directions lead off the grid" in {
+    "should calculate a position when the directions lead off the grid, making the robot appear on the opposite side of the grid" in {
       val startCoordinate = Coordinate(x = 3, y = 3)
       val fiveByFiveGrid  = Grid(height = 5, width = 5)
       val numberOfMoves   = 4
@@ -32,21 +34,22 @@ class MarsRoverTest extends FreeSpec with Matchers with TableDrivenPropertyCheck
 
       val data = Table(
         ("startDirection", "expectedEndCoordinate"),
-        (North, Coordinate(x = 3, y = 2)), // y would have been 3 + 4 = 7 (2 off grid)
-        (South, Coordinate(x = 3, y = 4)), // y would have been 3 - 4 = -1 (1 off grid)
-        (East, Coordinate(x = 2, y = 3)),  // x would have been 3 + 4 = 7 (2 off grid)
-        (West, Coordinate(x = 4, y = 3))   // x would have been 3 - 4 = -1 (1 off grid)
+        (North, startCoordinate.copy(y = 2)), // y would have been 3 + 4 = 7 (2 off grid)
+        (South, startCoordinate.copy(y = 4)), // y would have been 3 - 4 = -1 (1 off grid)
+        (East, startCoordinate.copy(x = 2)),  // x would have been 3 + 4 = 7 (2 off grid)
+        (West, startCoordinate.copy(x = 4))   // x would have been 3 - 4 = -1 (1 off grid)
       )
 
       forAll(data) { case (startDirection, expectedEndCoordinate) =>
-        val expectedEndPosition = (startDirection, expectedEndCoordinate)
-        MarsRover.getFinalPosition(instructions, startCoordinate, startDirection, fiveByFiveGrid) shouldBe expectedEndPosition
+        val startPosition       = Position(startDirection, startCoordinate)
+        val expectedEndPosition = Position(startDirection, expectedEndCoordinate)
+
+        MarsRover.getFinalPosition(instructions, startPosition, fiveByFiveGrid) shouldBe expectedEndPosition
       }
     }
 
-    "should be able to rotate clockwise" in {
-      val startCoordinate = Coordinate(x = 3, y = 3)
-      val instructions    = List(RotateClockwise)
+    "should calculate a final position given a single instruction to rotate clockwise" in {
+      val instructions = List(RotateClockwise)
 
       val data = Table(
         ("startDirection", "expectedEndDirection"),
@@ -57,14 +60,15 @@ class MarsRoverTest extends FreeSpec with Matchers with TableDrivenPropertyCheck
       )
 
       forAll(data) { case (startDirection, expectedEndDirection) =>
-        val expectedEndPosition = (expectedEndDirection, startCoordinate)
-        MarsRover.getFinalPosition(instructions, startCoordinate, startDirection, tenByTenGrid) shouldBe expectedEndPosition
+        val startPosition       = Position(startDirection, originCoordinate)
+        val expectedEndPosition = Position(expectedEndDirection, originCoordinate)
+
+        MarsRover.getFinalPosition(instructions, startPosition, tenByTenGrid) shouldBe expectedEndPosition
       }
     }
 
-    "should be able to rotate anticlockwise" in {
-      val startCoordinate = Coordinate(x = 3, y = 3)
-      val instructions    = List(RotateAnticlockwise)
+    "should calculate a final position given a single instruction to rotate anticlockwise" in {
+      val instructions = List(RotateAnticlockwise)
 
       val data = Table(
         ("startDirection", "expectedEndDirection"),
@@ -75,24 +79,25 @@ class MarsRoverTest extends FreeSpec with Matchers with TableDrivenPropertyCheck
       )
 
       forAll(data) { case (startDirection, expectedEndDirection) =>
-        val expectedEndPosition = (expectedEndDirection, startCoordinate)
-        MarsRover.getFinalPosition(instructions, startCoordinate, startDirection, tenByTenGrid) shouldBe expectedEndPosition
+        val startPosition       = Position(startDirection, originCoordinate)
+        val expectedEndPosition = Position(expectedEndDirection, originCoordinate)
+
+        MarsRover.getFinalPosition(instructions, startPosition, tenByTenGrid) shouldBe expectedEndPosition
       }
     }
 
-    "should be able to follow a set of various instructions correctly" in {
+    "should calculate a final position given an assorted mix of instructions" in {
       val grid = Grid(height = 3, width = 7)
 
-      val startCoordinate = Coordinate(x = 0, y = 0) // x0
-      val startDirection  = West
+      val startPosition = Position(West, originCoordinate) // x0 on grid drawn out below
       val instructions = List(
-        Forward,             // new position = x1
+        Forward,             // new position = x1 on grid drawn out below
         RotateAnticlockwise, // new direction = South
         Forward,             // new position = x2
         Forward,             // new position = x3
-        RotateClockwise,     // newDirection = West, position = x3
-        RotateClockwise,     // newDirection = North, position = x3
-        RotateClockwise,     // new Direction = East, position = x3
+        RotateClockwise,     // newDirection = West
+        RotateClockwise,     // newDirection = North
+        RotateClockwise,     // new Direction = East
         Forward,             // position = x4
         Forward,             // position = x5
         Forward,             // position = x6
@@ -102,7 +107,7 @@ class MarsRoverTest extends FreeSpec with Matchers with TableDrivenPropertyCheck
         Forward              // position = x8 so final position is x = 0, y = 3
       )
 
-      // visual representation of positions visited
+      // visual representation of positions visited (xn represents a coordinate that the robot visits)
       //                       x
       //        0    1    2    3    4    5    6
       //       ---------------------------------
@@ -111,9 +116,12 @@ class MarsRoverTest extends FreeSpec with Matchers with TableDrivenPropertyCheck
       //     0| x0        x7   x8             x1 |
       //       ----------------------------------
 
-      val expectedEndPosition = (East, Coordinate(x = 3, y = 0))
+      val expectedEndPosition = Position(East, Coordinate(x = 3, y = 0))
 
-      MarsRover.getFinalPosition(instructions, startCoordinate, startDirection, grid) shouldBe expectedEndPosition
+      MarsRover.getFinalPosition(instructions, startPosition, grid) shouldBe expectedEndPosition
     }
   }
+
+  private val tenByTenGrid     = Grid(height = 10, width = 10)
+  private val originCoordinate = Coordinate(0, 0)
 }
